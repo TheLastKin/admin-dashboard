@@ -1,4 +1,5 @@
-import firebase from "firebase";
+const firebase = require("firebase-admin");
+var serviceAccount = require("./duantotnghiep-73075-firebase-adminsdk-98hvp-15ab644de0.json");
 
 const firebaseConfig = {
   apiKey: "AIzaSyCyjXy2ScLYJqzubO9ijREkSja6MpTGiYA",
@@ -11,6 +12,10 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+firebase.initializeApp({
+  credential: firebase.credential.cert(serviceAccount),
+});
 const db = firebase.firestore();
-export { db };
+module.exports = db;
+
+// module.exports
