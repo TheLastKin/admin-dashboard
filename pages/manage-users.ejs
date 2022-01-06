@@ -427,7 +427,7 @@
                                                     <td><%= v.UserGender%></td>
                                                     <td >
                                                       <button type="button" class="btn btn-success" onclick="gotoEdit('<%=v.id%>')">Vô hiệu hoá</button>
-                                                      <button type="button" class="btn btn-danger" onclick="gotoDelete('<%=v.id%>')">Xoá</button>
+                                                      <button type="button" class="btn btn-danger" onclick="deleteProduct('<%=v.id%>')">Xoá</button>
                                                     </td>
                                                   </tr>  <%})
                                                   %> 
@@ -468,9 +468,18 @@
     <script src="../js/typeahead.js"></script>
     <script src="../js/select2.js"></script>
     <script>
-          const gotoDelete=(id)=>{
-            await db.collection("people").doc(id).delete();
-        }
+           function deleteProduct(id) {
+        $.ajax({
+          type: "DELETE",
+          url: '/manage-users-delete/' + id,
+          success: function(data)
+          {   
+            if(data.ress == true){
+              window.location.href='/manage-users'
+            }                
+          }
+        }); 
+      }
     </script>
 </body>
 
