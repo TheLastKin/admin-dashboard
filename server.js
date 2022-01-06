@@ -6,7 +6,7 @@ const path = require('path');
 app.use(express.static(path.join(__dirname, "assets")));
 app.set("view engine", "ejs");
 
-app.use("/dashboard", mainRouter);
+app.use("/", mainRouter);
 
 app.listen(3000, () => {
     console.log("Server is running in port 3000");
