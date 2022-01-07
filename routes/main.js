@@ -28,7 +28,6 @@ router.delete("/delete-product/:outerId/:type/:id", async (req, res) => {
 router.get("/edit-product/:outerId/:type/:id", async (req, res) => {
   const { outerId, type, id } = req.params;
   const product = await (await db.collection(`products/${outerId}/${type}`).get(id)).docs[0].data();
-  console.log(product);
   res.render("../pages/edit-product.ejs", { product: product, outerId: outerId, type: type, id: id });
 })
 
