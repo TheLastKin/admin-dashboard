@@ -21,18 +21,30 @@ router.delete("/delete-user/:id", async (req, res) => {
 
 router.delete("/delete-product/:outerId/:type/:id", async (req, res) => {
   let { outerId, type, id } = req.params;
-  await db.collection(`products/${outerId}/${type}`).doc(id).delete().then((value) => console.log(value)).catch(e => console.error(e));
+  await db
+    .collection(`products/${outerId}/${type}`)
+    .doc(id)
+    .delete()
+    .then((value) => console.log(value))
+    .catch((e) => console.error(e));
   res.send({ status: true });
-})
+});
 
 router.get("/edit-product/:outerId/:type/:id", async (req, res) => {
   const { outerId, type, id } = req.params;
-  const product = await (await db.collection(`products/${outerId}/${type}`).get(id)).docs[0].data();
+  const product = await (
+    await db.collection(`products/${outerId}/${type}`).doc(id).get()
+  ).data();
   console.log(product);
-  res.render("../pages/edit-product.ejs", { product: product, outerId: outerId, type: type, id: id });
-})
+  res.render("../pages/edit-product.ejs", {
+    product: product,
+    outerId: outerId,
+    type: type,
+    id: id,
+  });
+});
 
-router.post("/edit-product/:outerId/:type/:id", async(req, res) => {
+router.post("/edit-product/:outerId/:type/:id", async (req, res) => {
   const { outerId, type, id } = req.params;
   const productInfo = req.body;
   await db.collection(`products/${outerId}/${type}`).doc(id).update({
@@ -41,22 +53,42 @@ router.post("/edit-product/:outerId/:type/:id", async(req, res) => {
     image: productInfo.image,
   });
   res.send({ status: true });
-})
+});
 
 router.get("/manage-products", async (req, res) => {
   const Product = db.collection("products");
   const snapshot = await Product.get();
   let data = [];
-  for(let i = 0; i < snapshot.docs.length; i++){
-    await db.collection(`products/${snapshot.docs[i].id}/featureproduct`).get().then(snapshot2 => {
-      data.push(...snapshot2.docs.map(doc => ({ outerId: snapshot.docs[i].id, id: doc.id, type: "featureproduct", ...doc.data()})));
-    });
-    await db.collection(`products/${snapshot.docs[i].id}/newachives`).get().then(snapshot3 => {
-      data.push(...snapshot3.docs.map(doc => ({ outerId: snapshot.docs[i].id, id: doc.id, type: "newachives", ...doc.data()})))
-    });
+  for (let i = 0; i < snapshot.docs.length; i++) {
+    await db
+      .collection(`products/${snapshot.docs[i].id}/featureproduct`)
+      .get()
+      .then((snapshot2) => {
+        data.push(
+          ...snapshot2.docs.map((doc) => ({
+            outerId: snapshot.docs[i].id,
+            id: doc.id,
+            type: "featureproduct",
+            ...doc.data(),
+          }))
+        );
+      });
+    await db
+      .collection(`products/${snapshot.docs[i].id}/newachives`)
+      .get()
+      .then((snapshot3) => {
+        data.push(
+          ...snapshot3.docs.map((doc) => ({
+            outerId: snapshot.docs[i].id,
+            id: doc.id,
+            type: "newachives",
+            ...doc.data(),
+          }))
+        );
+      });
   }
   res.render("../pages/manage-products.ejs", { data: data });
-})
+});
 
 router.get("/manage-users2", (req, res) => {
   res.render("../pages/tables/basic-table.ejs");
