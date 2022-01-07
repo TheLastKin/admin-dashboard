@@ -4,6 +4,7 @@ const app = express();
 const mainRouter = require("./routes/main");
 const path = require("path");
 app.use(express.static(path.join(__dirname, "assets")));
+app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
 app.use("/", mainRouter);

@@ -16,6 +16,7 @@ firebase.initializeApp({
   credential: firebase.credential.cert(serviceAccount),
 });
 const db = firebase.firestore();
-module.exports = db;
+const store = firebase.storage();
+module.exports = { db, store };
 
 // module.exports

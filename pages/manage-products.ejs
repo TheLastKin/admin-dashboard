@@ -425,8 +425,8 @@
                                                     </td>
                                                     <td>
                                                         <div class="d-flex justify-content-center">
-                                                            <button type="button" class="btn btn-success" onclick="gotoEdit('<%=p.id%>')">Sửa sản phẩm</button>
-                                                            <button type="button" class="btn btn-danger ml-1" onclick="gotoDelete('<%=p.id%>')">Xoá</button>
+                                                            <button type="button" class="btn btn-success" onclick="gotoEdit('<%= p.outerId %>', '<%= p.type %>', '<%=p.id%>')">Sửa sản phẩm</button>
+                                                            <button type="button" class="btn btn-danger ml-1" onclick="deleteProduct('<%= p.outerId %>', '<%= p.type %>', '<%=p.id%>')">Xoá</button>
                                                         </div>
                                                     </td>
                                                   </tr>  <%})
@@ -468,8 +468,19 @@
     <script src="../js/typeahead.js"></script>
     <script src="../js/select2.js"></script>
     <script>
-          const gotoDelete=(id)=>{
-            await db.collection("people").doc(id).delete();
+        function deleteProduct(outerId, type, id) {
+            $.ajax({
+                type: "DELETE",
+                url: '/delete-product/' + outerId + "/" + type + "/" + id,
+                success: function (data) {
+                    if (data.status == true) {
+                        window.location.href = '/manage-products'
+                    }
+                }
+            });
+        }
+        function gotoEdit(outerId, type, id){
+            window.location.href = `/edit-product/${outerId}/${type}/${id}`;
         }
     </script>
 </body>
