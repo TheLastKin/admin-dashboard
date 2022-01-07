@@ -93,8 +93,7 @@
                     </ul>
                     <ul class="navbar-nav navbar-nav-right">
                         <li class="nav-item dropdown d-none d-lg-block">
-                            <a class="nav-link btn btn-success create-new-button" id="createbuttonDropdown"
-                                data-toggle="dropdown" aria-expanded="false" href="#">+ Create New Project</a>
+                          
                             <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list"
                                 aria-labelledby="createbuttonDropdown">
                                 <h6 class="p-3 mb-0">Projects</h6>
@@ -327,8 +326,18 @@
                                                             <%= v.UserGender%>
                                                         </td>
                                                         <td>
-                                                            <button type="button" class="btn btn-success"
-                                                                onclick="gotoEdit('<%=v.id%>')">Vô hiệu hoá</button>
+                                                            <% if(v.disabled){ %>
+                                                                <button type="button" class="btn btn-secondary"
+                                                                onclick="gotoEnable('<%=v.id%>')">Đã vô hiệu hoá
+                                                            
+                                                                </button>
+                                                              <% } else{ %>  
+                                                                <button type="button" class="btn btn-success"
+                                                                onclick="gotoDisable('<%=v.id%>')">Vô hiệu hoá
+                                                            
+                                                                </button>
+                                                             <% } %>
+                                                           
                                                             <button type="button" class="btn btn-danger"
                                                                 onclick="deleteUser('<%=v.id%>')">Xoá</button>
                                                         </td>
@@ -345,15 +354,7 @@
                 <!-- content-wrapper ends -->
                 <!-- partial:../../partials/_footer.html -->
                 <footer class="footer">
-                    <div class="d-sm-flex justify-content-center justify-content-sm-between">
-                        <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright ©
-                            bootstrapdash.com
-                            2020</span>
-                        <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> Free <a
-                                href="https://www.bootstrapdash.com/bootstrap-admin-template/" target="_blank">Bootstrap
-                                admin
-                                templates</a> from Bootstrapdash.com</span>
-                    </div>
+            
                 </footer>
                 <!-- partial -->
             </div>
@@ -375,6 +376,28 @@
             $.ajax({
                 type: "DELETE",
                 url: '/delete-user/' + id,
+                success: function (data) {
+                    if (data.ress == true) {
+                        window.location.href = '/manage-users'
+                    }
+                }
+            });
+        }
+        const gotoDisable =(id)=>{
+            $.ajax({
+                type: "POST",
+                url: '/disable-users/' + id,
+                success: function (data) {
+                    if (data.ress == true) {
+                        window.location.href = '/manage-users'
+                    }
+                }
+            });
+        }
+        const gotoEnable =(id)=>{
+            $.ajax({
+                type: "POST",
+                url: '/enable-users/' + id,
                 success: function (data) {
                     if (data.ress == true) {
                         window.location.href = '/manage-users'

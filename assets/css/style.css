@@ -8737,11 +8737,9 @@ pre {
 .table-dark tbody + tbody {
   border-color: #818181; }
 
-.table-hover .table-dark:hover {
-  background-color: black; }
+
   .table-hover .table-dark:hover > td,
-  .table-hover .table-dark:hover > th {
-    background-color: black; }
+ 
 
 .table-active,
 .table-active > th,
