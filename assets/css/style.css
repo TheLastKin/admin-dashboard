@@ -8737,11 +8737,9 @@ pre {
 .table-dark tbody + tbody {
   border-color: #818181; }
 
-.table-hover .table-dark:hover {
-  background-color: black; }
+
   .table-hover .table-dark:hover > td,
-  .table-hover .table-dark:hover > th {
-    background-color: black; }
+ 
 
 .table-active,
 .table-active > th,
@@ -21131,4 +21129,24 @@ div.tagsinput {
   width: 100%;
   -webkit-flex-grow: 1;
   flex-grow: 1; }
+
+.mdi-menu{
+  color: white !important;
+}
+
+.menu-title{
+  color: white !important;
+}
+
+th, td{
+  color: white !important;
+}
+
+.breadcrumb-item.active{
+  color: white !important;
+}
+
+.form-control:focus{
+  color: white !important;
+}
 /*# sourceMappingURL=maps/style.css.map */
