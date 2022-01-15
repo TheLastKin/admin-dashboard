@@ -54,7 +54,7 @@
                 </a>
               </li>
               <li class="nav-item menu-items">
-                <a class="nav-link" href="manage-products">
+                <a class="nav-link" href="manage-products/featureproduct">
                   <span class="menu-icon">
                     <i class="mdi mdi-table-large"></i>
                   </span>
@@ -307,7 +307,7 @@
                                         <div class="col-sm-9">
                                             <select class="form-select" name="category" id="product-category">
                                                 <option value="UhwQZY3X4WKjyr7LV8Sl/featureproduct">Sản phẩm nổi bật</option>
-                                                <option value="UhwQZY3X4WKjyr7LV8Sl/featureproduct">Sản phẩm mới</option>
+                                                <option value="UhwQZY3X4WKjyr7LV8Sl/newachives">Sản phẩm mới</option>
                                             </select>    
                                         </div>
                                     </div>
@@ -321,6 +321,18 @@
                                     <label for="product-email" class="col-sm-3 col-form-label">Giá</label>
                                     <div class="col-sm-9">
                                       <input type="number" class="form-control" name="price" id="product-email" placeholder="Giá" required min="1000">
+                                    </div>
+                                  </div>
+                                  <div class="form-group row">
+                                    <label for="product-email" class="col-sm-3 col-form-label">Giá Mua Vào</label>
+                                    <div class="col-sm-9">
+                                      <input type="number" class="form-control" name="purchaseprice" id="product-email" placeholder="Giá mua vào" required min="1000">
+                                    </div>
+                                  </div>
+                                  <div class="form-group row">
+                                    <label for="product-email" class="col-sm-3 col-form-label">Mô tả</label>
+                                    <div class="col-sm-9">
+                                      <textarea type="number" class="form-control" name="description" id="product-email" placeholder="Mô tả" ></textarea>
                                     </div>
                                   </div>
                                   <div class="form-group row">
@@ -370,7 +382,7 @@
             }
         }
         function goBack(){
-            window.location.href = "/manage-products"
+            window.location.href = "/manage-products/featureproduct"
         }
     </script>
 </body>

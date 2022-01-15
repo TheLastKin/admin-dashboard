@@ -1,11 +1,12 @@
 const router = require("express").Router();
-const { db, store, auth } = require("../config/config_firebase");
+const { db, store, auth, fireStore } = require("../config/config_firebase");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
 const fs = require("fs");
+const moment = require("moment");
 
 router.get("/", (req, res) => {
-  res.redirect("/manage-products");
+  res.redirect("/manage-products/featureproduct");
 });
 
 router.get("/manage-users", async (req, res) => {
@@ -99,7 +100,9 @@ router.post(
                 .doc(id)
                 .update({
                   name: productInfo.name,
-                  price: productInfo.price,
+                  price: Number(productInfo.price),
+                  purchaseprice: Number(productInfo.purchaseprice),
+                  description: productInfo.description,
                   image: results[0],
                 });
               fs.unlinkSync(productImage.path);
@@ -107,12 +110,17 @@ router.post(
             .catch((e) => console.log(e));
         });
     } else {
-      await db.collection(`products/${outerId}/${type}`).doc(id).update({
-        name: productInfo.name,
-        price: productInfo.price,
-      });
+      await db
+        .collection(`products/${outerId}/${type}`)
+        .doc(id)
+        .update({
+          name: productInfo.name,
+          price: Number(productInfo.price),
+          purchaseprice: Number(productInfo.purchaseprice),
+          description: productInfo.description,
+        });
     }
-    res.redirect("/manage-products");
+    res.redirect(`/manage-products/${type}`);
   }
 );
 
@@ -141,7 +149,9 @@ router.post("/add-product", upload.single("image"), async (req, res) => {
           .then(async (results) => {
             await db.collection(`products/${productInfo.category}`).add({
               name: productInfo.name,
-              price: productInfo.price,
+              price: Number(productInfo.price),
+              purchaseprice: Number(productInfo.purchaseprice),
+              description: productInfo.description,
               image: results[0],
             });
             fs.unlinkSync(productImage.path);
@@ -152,61 +162,137 @@ router.post("/add-product", upload.single("image"), async (req, res) => {
   res.redirect("/add-product");
 });
 
-router.get("/manage-products", async (req, res) => {
+router.get("/manage-products/:type", async (req, res) => {
+  const { type } = req.params;
   const Product = db.collection("products");
   const snapshot = await Product.get();
   let data = [];
   for (let i = 0; i < snapshot.docs.length; i++) {
     await db
-      .collection(`products/${snapshot.docs[i].id}/featureproduct`)
+      .collection(
+        `products/${snapshot.docs[i].id}/${type ? type : "featureproduct"}`
+      )
       .get()
       .then((snapshot2) => {
         data.push(
           ...snapshot2.docs.map((doc) => ({
             outerId: snapshot.docs[i].id,
             id: doc.id,
-            type: "featureproduct",
+            type: type ? type : "featureproduct",
             ...doc.data(),
           }))
         );
       });
-    await db
-      .collection(`products/${snapshot.docs[i].id}/newachives`)
-      .get()
-      .then((snapshot3) => {
-        data.push(
-          ...snapshot3.docs.map((doc) => ({
-            outerId: snapshot.docs[i].id,
-            id: doc.id,
-            type: "newachives",
-            ...doc.data(),
-          }))
-        );
-      });
+    // await db
+    //   .collection(`products/${snapshot.docs[i].id}/newachives`)
+    //   .get()
+    //   .then((snapshot3) => {
+    //     data.push(
+    //       ...snapshot3.docs.map((doc) => ({
+    //         outerId: snapshot.docs[i].id,
+    //         id: doc.id,
+    //         type: "newachives",
+    //         ...doc.data(),
+    //       }))
+    //     );
+    //   });
   }
+
   res.render("../pages/manage-products.ejs", { data: data });
 });
-
+var lastday = function (y, m) {
+  return new Date(y, m + 1, 0).getDate();
+};
 router.get("/manage-orders", async (req, res) => {
+  const date = new Date();
   const Order = db.collection("Order");
+
   const snapshot = await Order.get();
-  const orders = snapshot.docs.map((doc) => ({id: doc.id, ...doc.data()}));
-  res.render("../pages/manage-orders.ejs", { data: orders });
+  const orders = snapshot.docs.map((doc) => {
+    let dateOrder = moment(doc.data().date?._seconds * 1000).format(
+      "DD/MM/YYYY"
+    );
+    return {
+      id: doc.id,
+      dateOrder: dateOrder,
+      ...doc.data(),
+    };
+  });
+  let totalPriceMonth = 0;
+  let totalPriceDateNow = 0;
+  let totalPriceWeek = 0;
+  let totalPriceYear = 0;
+
+  var monday = moment().clone().weekday(1).format("X");
+  var sunday = moment().clone().weekday(7).format("X");
+  var monday2 = moment().clone().weekday(1).format("DD/MM/YYYY");
+  var sunday2 = moment().clone().weekday(7).format("DD/MM/YYYY");
+  for (let index = 0; index < orders.length; index++) {
+    const element = orders[index];
+    if (
+      element.dateOrder.includes(moment().format("MM/YYYY")) &&
+      element.status === "successfully"
+    ) {
+      totalPriceMonth += Number(element.TotalPrice);
+    }
+    if (
+      element.dateOrder.includes(moment().format("DD/MM/YYYY")) &&
+      element.status === "successfully"
+    ) {
+      totalPriceDateNow += Number(element.TotalPrice);
+    }
+    if (
+      element.dateOrder.includes(moment().format("YYYY")) &&
+      element.status === "successfully"
+    ) {
+      totalPriceYear += Number(element.TotalPrice);
+    }
+    if (
+      new Date(
+        `${element.dateOrder}`.split("/")[2],
+        `${element.dateOrder}`.split("/")[1] - 1,
+        `${element.dateOrder}`.split("/")[0]
+      ).getTime() >
+        monday * 1000 &&
+      new Date(
+        `${element.dateOrder}`.split("/")[2],
+        `${element.dateOrder}`.split("/")[1] - 1,
+        `${element.dateOrder}`.split("/")[0]
+      ).getTime() <
+        sunday * 1000 &&
+      element.status === "successfully"
+    ) {
+      totalPriceWeek += Number(element.TotalPrice);
+    }
+  }
+
+  res.render("../pages/manage-orders.ejs", {
+    data: orders,
+    totalPriceMonth,
+    totalPriceDateNow,
+    totalPriceWeek,
+    monday2,
+    sunday2,
+    totalPriceYear,
+  });
 });
 
 router.post("/update-order-status", async (req, res) => {
   const orderInfo = req.body;
-  if(orderInfo){
-    await db.collection("Order").doc(orderInfo.id).update({ status: orderInfo.status })
+  if (orderInfo) {
+    await db
+      .collection("Order")
+      .doc(orderInfo.id)
+      .update({ status: orderInfo.status })
       .then(() => {
-        res.send({ status: true })
+        res.send({ status: true });
       })
       .catch(() => {
-        res.send({ status: false })
-      })
-  }else{
-    res.send({ status: false })
+        res.send({ status: false });
+      });
+  } else {
+    res.send({ status: false });
   }
-})
+});
 
 module.exports = router;

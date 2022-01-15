@@ -315,6 +315,18 @@
                                     </div>
                                   </div>
                                   <div class="form-group row">
+                                    <label for="product-email" class="col-sm-3 col-form-label">Giá Mua Vào</label>
+                                    <div class="col-sm-9">
+                                      <input type="number" class="form-control" name="purchaseprice" id="product-email" placeholder="Giá mua vào" value="<%= product.purchaseprice %>" >
+                                    </div>
+                                  </div>
+                                  <div class="form-group row">
+                                    <label for="product-email" class="col-sm-3 col-form-label">Mô tả</label>
+                                    <div class="col-sm-9">
+                                      <textarea type="number" class="form-control" name="description" id="product-email" placeholder="Mô tả" ><%= product.description %></textarea>
+                                    </div>
+                                  </div>
+                                  <div class="form-group row">
                                     <label for="product-image" class="col-sm-3 col-form-label">Ảnh</label>
                                     <div class="col-sm-9">
                                       <img style="max-width: 500px;" id="display-image" src="<%= product.image %>" alt="">
@@ -322,7 +334,7 @@
                                     </div>
                                   </div>
                                   <button type="submit" class="btn btn-primary mr-2">Cập nhật</button>
-                                  <button class="btn btn-dark" onclick="goBack()">Quay lại</button>
+                                  <button class="btn btn-dark" onclick="goBack('<%= type %>')">Quay lại</button>
                                 </form>
                               </div>
                             </div>
@@ -360,8 +372,8 @@
                 reader.readAsDataURL(file)
             }
         }
-        function goBack(){
-            window.location.href = "/manage-products"
+        function goBack(type){
+            window.location.href = `/manage-products/${type}`
         }
     </script>
 </body>
