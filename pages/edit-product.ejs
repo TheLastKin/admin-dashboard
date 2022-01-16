@@ -77,6 +77,14 @@
                   <span class="menu-title">Thêm sản phẩm</span>
                 </a>
               </li>
+              <li class="nav-item menu-items">
+                <a class="nav-link" href="../statistical">
+                    <span class="menu-icon">
+                        <i class="mdi mdi-playlist-play"></i>
+                    </span>
+                    <span class="menu-title">Thống Kê</span>
+                </a>
+            </li>
             </ul>
           </nav>
         <div class="container-fluid page-body-wrapper">
@@ -312,6 +320,12 @@
                                     <label for="product-email" class="col-sm-3 col-form-label">Giá</label>
                                     <div class="col-sm-9">
                                       <input type="number" class="form-control" name="price" id="product-email" placeholder="Giá" value="<%= product.price %>" required>
+                                    </div>
+                                  </div>
+                                  <div class="form-group row">
+                                    <label for="product-email" class="col-sm-3 col-form-label">Số lượng</label>
+                                    <div class="col-sm-9">
+                                      <input type="number" class="form-control" name="quantity" id="product-email" placeholder="Số lượng" required min="1" value="<%= product.quantily %>">
                                     </div>
                                   </div>
                                   <div class="form-group row">

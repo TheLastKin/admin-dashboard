@@ -80,6 +80,14 @@
                         <span class="menu-title">Thêm sản phẩm</span>
                     </a>
                 </li>
+                <li class="nav-item menu-items">
+                    <a class="nav-link" href="../statistical">
+                        <span class="menu-icon">
+                            <i class="mdi mdi-playlist-play"></i>
+                        </span>
+                        <span class="menu-title">Thống Kê</span>
+                    </a>
+                </li>
             </ul>
         </nav>
         <div class="container-fluid page-body-wrapper">
@@ -324,6 +332,7 @@
                                                     <th>Tên Sản Phẩm</th>
                                                     <th>Giá (USD)</th>
                                                     <th>Giá Mua Vào (USD)</th>
+                                                    <th>Số lượng</th>
                                                     <th class="text-center">Ảnh</th>
                                                     <th class="text-center">Hành Động</th>
                                                 </tr>
@@ -342,7 +351,12 @@
                                                           <% } else{ %>  
                                                             <td>Chưa cập nhật</td>
                                                          <% } %>
-                                                      
+                                                         <% if(p.quantily === 0){ %>
+                                                            <td>hết hàng</td>
+                    
+                                                          <% } else{ %>  
+                                                            <td>Hàng tồn kho (<%= p.quantily %>)</td>
+                                                         <% } %>
                                                         <td class="d-flex justify-content-center">
                                                             <img style="width: 100px; height: 100px"
                                                                 src="<%= p.image %>">

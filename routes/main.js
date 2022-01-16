@@ -103,6 +103,8 @@ router.post(
                   price: Number(productInfo.price),
                   purchaseprice: Number(productInfo.purchaseprice),
                   description: productInfo.description,
+                  quantily: Number(productInfo.quantity),
+                  quantitydefault: Number(productInfo.quantity),
                   image: results[0],
                 });
               fs.unlinkSync(productImage.path);
@@ -118,6 +120,8 @@ router.post(
           price: Number(productInfo.price),
           purchaseprice: Number(productInfo.purchaseprice),
           description: productInfo.description,
+          quantily: Number(productInfo.quantity),
+          quantitydefault: Number(productInfo.quantity),
         });
     }
     res.redirect(`/manage-products/${type}`);
@@ -153,6 +157,8 @@ router.post("/add-product", upload.single("image"), async (req, res) => {
               purchaseprice: Number(productInfo.purchaseprice),
               description: productInfo.description,
               image: results[0],
+              quantily: Number(productInfo.quantity),
+              quantitydefault: Number(productInfo.quantity),
             });
             fs.unlinkSync(productImage.path);
           })
@@ -274,6 +280,121 @@ router.get("/manage-orders", async (req, res) => {
     monday2,
     sunday2,
     totalPriceYear,
+  });
+});
+
+router.get("/statistical", async (req, res) => {
+  const date = new Date();
+  const Order = db.collection("Order");
+
+  const snapshot = await Order.get();
+  const orders = snapshot.docs.map((doc) => {
+    let dateOrder = moment(doc.data().date?._seconds * 1000).format(
+      "DD/MM/YYYY"
+    );
+    return {
+      id: doc.id,
+      dateOrder: dateOrder,
+      ...doc.data(),
+    };
+  });
+  let totalPriceMonth = 0;
+  let totalPriceDateNow = 0;
+  let totalPriceWeek = 0;
+  let totalPriceYear = 0;
+
+  var monday = moment().clone().weekday(1).format("X");
+  var sunday = moment().clone().weekday(7).format("X");
+  var monday2 = moment().clone().weekday(1).format("DD/MM/YYYY");
+  var sunday2 = moment().clone().weekday(7).format("DD/MM/YYYY");
+  for (let index = 0; index < orders.length; index++) {
+    const element = orders[index];
+    if (
+      element.dateOrder.includes(moment().format("MM/YYYY")) &&
+      element.status === "successfully"
+    ) {
+      totalPriceMonth += Number(element.TotalPrice);
+    }
+    if (
+      element.dateOrder.includes(moment().format("DD/MM/YYYY")) &&
+      element.status === "successfully"
+    ) {
+      totalPriceDateNow += Number(element.TotalPrice);
+    }
+    if (
+      element.dateOrder.includes(moment().format("YYYY")) &&
+      element.status === "successfully"
+    ) {
+      totalPriceYear += Number(element.TotalPrice);
+    }
+    if (
+      new Date(
+        `${element.dateOrder}`.split("/")[2],
+        `${element.dateOrder}`.split("/")[1] - 1,
+        `${element.dateOrder}`.split("/")[0]
+      ).getTime() >
+        monday * 1000 &&
+      new Date(
+        `${element.dateOrder}`.split("/")[2],
+        `${element.dateOrder}`.split("/")[1] - 1,
+        `${element.dateOrder}`.split("/")[0]
+      ).getTime() <
+        sunday * 1000 &&
+      element.status === "successfully"
+    ) {
+      totalPriceWeek += Number(element.TotalPrice);
+    }
+  }
+  const Product = db.collection("products");
+  const snapshots = await Product.get();
+  let data = [];
+  for (let i = 0; i < snapshots.docs.length; i++) {
+    await db
+      .collection(`products/${snapshots.docs[i].id}/${"featureproduct"}`)
+      .get()
+      .then((snapshot2) => {
+        data.push(
+          ...snapshot2.docs.map((doc) => ({
+            outerId: snapshots.docs[i].id,
+            id: doc.id,
+            type: "featureproduct",
+            ...doc.data(),
+          }))
+        );
+      });
+    await db
+      .collection(`products/${snapshots.docs[i].id}/newachives`)
+      .get()
+      .then((snapshot3) => {
+        data.push(
+          ...snapshot3.docs.map((doc) => ({
+            outerId: snapshots.docs[i].id,
+            id: doc.id,
+            type: "newachives",
+            ...doc.data(),
+          }))
+        );
+      });
+  }
+  let totalCapital = 0;
+  if (data.length) {
+    for (let index = 0; index < data.length; index++) {
+      let element = data[index];
+      totalCapital += element.purchaseprice * element.quantitydefault;
+    }
+  }
+
+  let hole = totalPriceYear - totalCapital;
+
+  res.render("../pages/statistical.ejs", {
+    totalPriceMonth,
+    totalPriceDateNow,
+    totalPriceWeek,
+    monday2,
+    sunday2,
+    totalPriceYear,
+    totalCapital,
+    hole,
   });
 });
 
