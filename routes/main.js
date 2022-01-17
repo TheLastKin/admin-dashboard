@@ -213,7 +213,7 @@ router.get("/manage-orders", async (req, res) => {
   const date = new Date();
   const Order = db.collection("Order");
 
-  const snapshot = await Order.get();
+  const snapshot = await Order.orderBy("date").get();
   const orders = snapshot.docs.map((doc) => {
     let dateOrder = moment(doc.data().date?._seconds * 1000).format(
       "DD/MM/YYYY"
@@ -273,7 +273,7 @@ router.get("/manage-orders", async (req, res) => {
   }
 
   res.render("../pages/manage-orders.ejs", {
-    data: orders,
+    data: orders?.reverse(),
     totalPriceMonth,
     totalPriceDateNow,
     totalPriceWeek,
@@ -400,6 +400,37 @@ router.get("/statistical", async (req, res) => {
 
 router.post("/update-order-status", async (req, res) => {
   const orderInfo = req.body;
+  const Product = db.collection("products");
+  const snapshots = await Product.get();
+  let data = [];
+  for (let i = 0; i < snapshots.docs.length; i++) {
+    await db
+      .collection(`products/${snapshots.docs[i].id}/${"featureproduct"}`)
+      .get()
+      .then((snapshot2) => {
+        data.push(
+          ...snapshot2.docs.map((doc) => ({
+            outerId: snapshots.docs[i].id,
+            id: doc.id,
+            type: "featureproduct",
+            ...doc.data(),
+          }))
+        );
+      });
+    await db
+      .collection(`products/${snapshots.docs[i].id}/newachives`)
+      .get()
+      .then((snapshot3) => {
+        data.push(
+          ...snapshot3.docs.map((doc) => ({
+            outerId: snapshots.docs[i].id,
+            id: doc.id,
+            type: "newachives",
+            ...doc.data(),
+          }))
+        );
+      });
+  }
   if (orderInfo) {
     await db
       .collection("Order")
@@ -407,6 +438,28 @@ router.post("/update-order-status", async (req, res) => {
       .update({ status: orderInfo.status })
       .then(() => {
         res.send({ status: true });
+
+        let product = JSON.parse(orderInfo.product);
+        for (let i = 0; i < data.length; i++) {
+          let element = data[i];
+          for (let index = 0; index < product.length; index++) {
+            let element1 = product[index];
+            if (element.name === element1.ProductName) {
+              console.log("id", element.id);
+              db.collection(`products/UhwQZY3X4WKjyr7LV8Sl/${element.type}`)
+                .doc(element.id)
+                .update({
+                  quantily: element.quantily - element1.ProductQuetity,
+                })
+                .then(() => {
+                  console.log("thanh cong");
+                })
+                .catch((error) => {
+                  console.log("That bai", error);
+                });
+            }
+          }
+        }
       })
       .catch(() => {
         res.send({ status: false });

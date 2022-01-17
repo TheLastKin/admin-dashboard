@@ -358,7 +358,7 @@
                                                             <div class="d-flex justify-content-center">
                                                                 <% if(o.status==="pendding" ) { %>
                                                                     <button type="button" class="btn btn-primary"
-                                                                        onclick="updateOrderStatus('<%= o.id %>','successfully')">
+                                                                        onclick="updateOrderStatus('<%= o.id %>','successfully','<%= JSON.stringify(o.Product) %>')">
                                                                         Nhận đơn
                                                                     </button>
                                                                     <button type="button" class="btn btn-danger ml-1"
@@ -454,11 +454,12 @@
             }
             document.getElementById("products").innerHTML = tableRows;
         }
-        function updateOrderStatus(orderId, status) {
+        function updateOrderStatus(orderId, status,product) {
+            console.log('product',product)
             $.ajax({
                 url: "/update-order-status",
                 method: "POST",
-                data: { id: orderId, status: status },
+                data: { id: orderId, status: status ,product:product},
                 success: (data) => {
                     if (data.status) {
                         location.reload();
