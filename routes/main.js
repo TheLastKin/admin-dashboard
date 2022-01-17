@@ -289,9 +289,9 @@ router.get("/statistical", async (req, res) => {
 
   const snapshot = await Order.get();
   const orders = snapshot.docs.map((doc) => {
-    let dateOrder = moment(doc.data().date?._seconds * 1000).format(
-      "DD/MM/YYYY"
-    );
+    let dateOrder = doc.data().date
+      ? moment(doc.data().date._seconds * 1000).format("DD/MM/YYYY")
+      : moment().format("DD/MM/YYYY");
     return {
       id: doc.id,
       dateOrder: dateOrder,
