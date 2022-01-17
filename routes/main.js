@@ -273,7 +273,7 @@ router.get("/manage-orders", async (req, res) => {
   }
 
   res.render("../pages/manage-orders.ejs", {
-    data: orders?.reverse(),
+    data: orders.reverse(),
     totalPriceMonth,
     totalPriceDateNow,
     totalPriceWeek,
